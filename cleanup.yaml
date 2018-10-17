@@ -1,6 +1,6 @@
 ---
 - hosts: master
-  gather_facts: yes
+  gather_facts: no
   vars:
     home: /root
     istio_dir: "{{ home }}/istio-1.0.2"
