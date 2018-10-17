@@ -1,26 +1,48 @@
 ---
 - hosts: master
   vars:
-    home: "{{ hostvars['localhost']['ansible_facts']['env']['HOME'] }}"
+    #home: "{{ hostvars['localhost']['ansible_facts']['env']['HOME'] }}"
+    home: /root
     istio_dir: "{{ home }}/istio-1.0.2"
     istioctl: "{{ istio_dir }}/bin/istioctl"
     tutorial_dir: "{{ home }}/istio-tutorial"
     customer_dir: "{{ tutorial_dir }}/customer/java/springboot/"
     recommendation_dir: "{{ tutorial_dir }}/recommendation/java/vertx"
     preference_dir: "{{ tutorial_dir }}/preference/java/springboot"
-    oc: "/usr/local/bin/oc"
-    mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
+    oc: "/usr/bin/oc"
+    maven_dir: '{{ home }}/apache-maven-3.5.4'
+    mvn: "{{ maven_dir }}/bin/mvn"
+    maven_download_link: http://mirror.rise.ph/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz 
     docker: "/bin/docker"
   tasks:
+    - name: Check if maven needs to be downloade
+      stat:
+        path: '{{ maven_dir }}'
+      register: maven_st
+
+    - name: Download maven
+      command: 'curl -L {{ maven_download_link }} -o apache-maven-3.5.4-bin.tar.gz' 
+      when: not maven_st.stat.exists
+
+    - name: Unpack maven
+      command: 'tar xzf apache-maven-3.5.4-bin.tar.gz'
+ 
+    - name: Check if istio needs to be downloaded
+      stat:
+        path: '{{ istio_dir }}'
+      register: st
+      
     - name: Download istio 1.0.2
       command: curl -L https://github.com/istio/istio/releases/download/1.0.2/istio-1.0.2-linux.tar.gz -o istio.tar.gz
       args:
         chdir: '{{ home }}'
+      when: not st.stat.exists
 
     - name: Unpack istio
       command: tar xzf istio.tar.gz
       args:
         chdir: '{{ home }}'
+      when: not st.stat.exists
 
     - name: Give proper permissions
       shell: |
@@ -103,37 +125,37 @@
       args:
         chdir: "{{ preference_dir }}"
 
-    - name: Build docker image
+    - name: Build preference docker image
       command: "{{ docker }} build -t example/preference:v1 ."
       args:
         chdir: "{{ preference_dir }}"
     
-    - name: Create the deployment
+    - name: Create the preference deployment
       shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
       args:
         chdir: "{{ preference_dir }}" 
 
-    - name: Create Service
+    - name: Create preference Service
       command: "{{ oc }} create -f ../../kubernetes/Service.yml -n tutorial"
       args:
         chdir: "{{ preference_dir }}"
  
-    - name: 
+    - name: Build Recommendation
       command: "{{ mvn }} clean package"
       args:
         chdir: "{{ recommendation_dir }}"
 
-    - name: Build docker image
+    - name: Build recommendation docker image
       command: "{{ docker }} build -t example/recommendation:v1 ."
       args:
         chdir: "{{ recommendation_dir }}"
     
-    - name: Create the deployment
+    - name: Create the recommendation deployment
       shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
       args:
         chdir: "{{ recommendation_dir }}" 
 
-    - name: Create Service
+    - name: Create recommendation Service
       command: "{{ oc }} create -f ../../kubernetes/Service.yml -n tutorial"
       args:
         chdir: "{{ recommendation_dir }}"
