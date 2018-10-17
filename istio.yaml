@@ -1,7 +1,6 @@
 ---
 - hosts: master
   vars:
-    #home: "{{ hostvars['localhost']['ansible_facts']['env']['HOME'] }}"
     home: /root
     istio_dir: "{{ home }}/istio-1.0.2"
     istioctl: "{{ istio_dir }}/bin/istioctl"
@@ -15,13 +14,17 @@
     maven_download_link: http://mirror.rise.ph/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz 
     docker: "/bin/docker"
   tasks:
+    - name: Make sure we have jdk
+      yum: java-1.8.0-openjdk-devel
+      state: present
+
     - name: Check if maven needs to be downloade
       stat:
         path: '{{ maven_dir }}'
       register: maven_st
 
     - name: Download maven
-      command: 'curl -L {{ maven_download_link }} -o apache-maven-3.5.4-bin.tar.gz' 
+      command: 'curl -L {{ maven_download_link }} -o {{ home }}/apache-maven-3.5.4-bin.tar.gz' 
       when: not maven_st.stat.exists
 
     - name: Unpack maven
