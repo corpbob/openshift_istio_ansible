@@ -14,9 +14,13 @@
   tasks:
     - name: Download istio 1.0.2
       command: curl -L https://github.com/istio/istio/releases/download/1.0.2/istio-1.0.2-linux.tar.gz -o istio.tar.gz
+      args:
+        chdir: '{{ home }}'
 
     - name: Unpack istio
       command: tar xzf istio.tar.gz
+      args:
+        chdir: '{{ home }}'
 
     - name: Give proper permissions
       shell: |
@@ -38,10 +42,6 @@
       args:
         chdir: '{{ istio_dir }}'
 
-    - name: Create tutorial project
-      command: "{{ oc }} new-project tutorial"
-
-
     - name: Create istio project
       command: '{{ oc }} apply -f install/kubernetes/istio-demo.yaml'
       args:
@@ -55,17 +55,24 @@
         - grafana
         - prometheus
         - tracing
+      ignore_errors: yes
+
+    - name: Create tutorial project
+      command: "{{ oc }} new-project tutorial"
+      ignore_errors: yes
 
     - name: Add SCC
       command: "{{ oc }} adm policy add-scc-to-user privileged -z default -n tutorial"
 
     - name: Determine if directory is istio-tutorial exists
       stat:
-        path: istio-tutorial
+        path: '{{ home }}/istio-tutorial'
       register: directory_details
 
     - name: Clone the tutorial
       command: git clone https://github.com/redhat-developer-demos/istio-tutorial
+      args:
+        chdir: '{{ home }}'
       when: not directory_details.stat.exists 
     
     - name: Compile customer service
