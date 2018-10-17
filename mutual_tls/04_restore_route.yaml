@@ -1,6 +1,6 @@
 ---
 - hosts: master
-  gather_facts: yes
+  gather_facts: no
   vars:
     home: /root
     istio_dir: "{{ home }}/istio-1.0.2"
@@ -9,14 +9,9 @@
     customer_dir: "{{ tutorial_dir }}/customer/java/springboot/"
     recommendation_dir: "{{ tutorial_dir }}/recommendation/java/vertx"
     preference_dir: "{{ tutorial_dir }}/preference/java/springboot"
-    oc: "/usr/local/bin/oc"
+    oc: "/usr/bin/oc"
     mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
     docker: "/bin/docker"
   tasks:
-    - name: Inject 503 to 50% of requests
-      shell: |
-        {{ istioctl }} create -f istiofiles/destination-rule-recommendation.yml -n tutorial
-        {{ istioctl }} create -f istiofiles/virtual-service-recommendation-503.yml -n tutorial
-      args:
-        chdir: "{{ tutorial_dir }}"
-
+    - name: Restore route
+      command: oc expose service customer

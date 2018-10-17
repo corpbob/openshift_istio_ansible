@@ -2,14 +2,14 @@
 - hosts: master
   gather_facts: no
   vars:
-    home: "{{ hostvars['localhost']['ansible_facts']['env']['HOME'] }}"
+    home: /root
     istio_dir: "{{ home }}/istio-1.0.2"
     istioctl: "{{ istio_dir }}/bin/istioctl"
     tutorial_dir: "{{ home }}/istio-tutorial"
     customer_dir: "{{ tutorial_dir }}/customer/java/springboot/"
     recommendation_dir: "{{ tutorial_dir }}/recommendation/java/vertx"
     preference_dir: "{{ tutorial_dir }}/preference/java/springboot"
-    oc: "/usr/local/bin/oc"
+    oc: "/usr/bin/oc"
     mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
     docker: "/bin/docker"
   tasks:

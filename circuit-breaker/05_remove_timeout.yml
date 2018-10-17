@@ -1,5 +1,6 @@
 ---
 - hosts: master
+  gather_facts: yes
   vars:
     home: /root
     istio_dir: "{{ home }}/istio-1.0.2"
@@ -12,18 +13,22 @@
     mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
     docker: "/bin/docker"
   tasks:
-    - name: 
+    - name: Remove timeout to recommendation v2
+      lineinfile:
+        path: '{{ recommendation_dir }}/src/main/java/com/redhat/developer/demos/recommendation/RecommendationVerticle.java'
+        regexp: '        router.get\("/"\).handler\(this::timeout\);'
+        line: '//        router.get("/").handler(this::timeout);'
+        state: present
+
+    - name: Build Recommendation
       command: "{{ mvn }} clean package"
       args:
         chdir: "{{ recommendation_dir }}"
 
-    - name: Build docker image
+    - name: Build recommendation docker image
       command: "{{ docker }} build -t example/recommendation:v2 ."
       args:
         chdir: "{{ recommendation_dir }}"
-    
-    - name: Create the deployment
-      shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment-v2.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
-      args:
-        chdir: "{{ recommendation_dir }}" 
 
+    - name: Delete old pod
+      command: '{{ oc }} delete pod -l app=recommendation,version=v2'
