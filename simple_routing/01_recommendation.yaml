@@ -12,6 +12,13 @@
     mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
     docker: "/bin/docker"
   tasks:
+    - name: Create version 2
+      lineinfile:
+        path: '{{ recommendation_dir }}/src/main/java/com/redhat/developer/demos/recommendation/RecommendationVerticle.java'
+        regexp: '^(.*)recommendation v1 from(.*)$'
+        line: '\1recommendation v2 from\2'
+        backrefs: yes
+
     - name: 
       command: "{{ mvn }} clean package"
       args:
@@ -26,4 +33,7 @@
       shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment-v2.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
       args:
         chdir: "{{ recommendation_dir }}" 
+
+    - name: Delete old pod
+      command: '{{ oc }} delete pod -l app=recommendation,version=v2'
 

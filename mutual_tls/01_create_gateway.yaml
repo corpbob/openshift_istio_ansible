@@ -1,6 +1,6 @@
 ---
 - hosts: master
-  gather_facts: yes
+  gather_facts: no
   vars:
     home: /root
     istio_dir: "{{ home }}/istio-1.0.2"
@@ -20,3 +20,10 @@
       command: '{{ istioctl }} create -f istiofiles/gateway-customer.yml'
       args:
         chdir: '{{ tutorial_dir }}'
+
+    - name: Create a destination rule
+      shell: |
+        {{ istioctl }} create -f istiofiles/destination-rule-recommendation-v1-v2.yml -n tutorial
+        {{ istioctl }} create -f istiofiles/virtual-service-recommendation-v2.yml -n tutorial
+      args:
+        chdir: "{{ tutorial_dir }}"

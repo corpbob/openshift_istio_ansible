@@ -1,0 +1,54 @@
+---
+- hosts: master
+  gather_facts: no
+  vars:
+    home: /root
+    istio_dir: "{{ home }}/istio-1.0.2"
+    istioctl: "{{ istio_dir }}/bin/istioctl"
+    tutorial_dir: "{{ home }}/istio-tutorial"
+    customer_dir: "{{ tutorial_dir }}/customer/java/springboot/"
+    recommendation_dir: "{{ tutorial_dir }}/recommendation/java/vertx"
+    preference_dir: "{{ tutorial_dir }}/preference/java/springboot"
+    oc: "/usr/bin/oc"
+    mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
+    docker: "/bin/docker"
+  tasks:
+    - name: Create recommendation version 3
+      lineinfile:
+        path: '{{ recommendation_dir }}/src/main/java/com/redhat/developer/demos/recommendation/RecommendationVerticle.java'
+        regexp: '^.*private static final String RESPONSE_STRING_FORMAT.*$'
+        line: '    private static final String RESPONSE_STRING_FORMAT = "recommendation v3 from %s: %d\n";'
+        state: present
+
+    - name: Uncomment code to connect to httpbin
+      lineinfile:
+        path: '{{ recommendation_dir }}/src/main/java/com/redhat/developer/demos/recommendation/RecommendationVerticle.java'
+        regexp: '.*router.get.*getN.*'
+        line: '        router.get("/").handler(this::getNow);'
+        state: present
+
+
+    - name: Comment out code to connect to recommendations
+      lineinfile:
+        path: '{{ recommendation_dir }}/src/main/java/com/redhat/developer/demos/recommendation/RecommendationVerticle.java'
+        regexp: '.*router.get.*getRecommendation.*'
+        line: '//        router.get("/").handler(this::getRecommendations);'
+        state: present
+
+    - name: Build Recommendation
+      command: "{{ mvn }} clean package"
+      args:
+        chdir: "{{ recommendation_dir }}"
+
+    - name: Build recommendation docker image
+      command: "{{ docker }} build -t example/recommendation:v3 ."
+      args:
+        chdir: "{{ recommendation_dir }}"
+
+    - name: Create the v3 deployment
+      shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment-v3.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
+      args:
+        chdir: "{{ recommendation_dir }}"
+
+    - name: Delete old pod
+      command: '{{ oc }} delete pod -l app=recommendation,version=v3'

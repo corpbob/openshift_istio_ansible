@@ -16,7 +16,7 @@
     - name: Introduce timeout to recommendation v2
       lineinfile:
         path: '{{ recommendation_dir }}/src/main/java/com/redhat/developer/demos/recommendation/RecommendationVerticle.java'
-        regexp: '//        router.get\("/"\).handler\(this::timeout\);'
+        regexp: '.*router.get.*timeout.*'
         line: '        router.get("/").handler(this::timeout);'
         state: present
 

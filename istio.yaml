@@ -15,8 +15,9 @@
     docker: "/bin/docker"
   tasks:
     - name: Make sure we have jdk
-      yum: java-1.8.0-openjdk-devel
-      state: present
+      yum: 
+        name: java-1.8.0-openjdk-devel
+        state: present
 
     - name: Check if maven needs to be downloade
       stat:

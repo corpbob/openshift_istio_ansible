@@ -2,7 +2,7 @@
 - hosts: master
   gather_facts: no
   vars:
-    home: /root/
+    home: /root
     istio_dir: "{{ home }}/istio-1.0.2"
     istioctl: "{{ istio_dir }}/bin/istioctl"
     tutorial_dir: "{{ home }}/istio-tutorial"
@@ -13,9 +13,9 @@
     mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
     docker: "/bin/docker"
   tasks:
-    - name: Cleanup 
+    - name: Redirect traffic to version 3
       shell: |
-        {{ oc }} exec -it $(oc get pods|grep recommendation-v2|awk '{ print $1 }'|head -1) -c recommendation curl localhost:8080/behave
+        {{ istioctl }} create -f istiofiles/destination-rule-recommendation-v1-v2-v3.yml -n tutorial
+        {{ istioctl }} create -f istiofiles/virtual-service-recommendation-v3.yml
       args:
-        chdir: "{{ tutorial_dir }}"
-
+        chdir: '{{ tutorial_dir }}'
