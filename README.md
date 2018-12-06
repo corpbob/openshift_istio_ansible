@@ -856,7 +856,7 @@ Now it's time to impress the audience with some graphics!
 
 2. Open the grafana url and show the audience the Istio Workload Dashboard:
 
-![Istio Workload Dashboard](images/istio_workload_dashboard.png)
+![Istio Pilot Dashboard](images/istio_pilot_dashboard.png)
 
 ### Demo Kiali
 
