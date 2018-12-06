@@ -13,33 +13,14 @@
     mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
     docker: "/bin/docker"
   tasks:
-    - name: Delete customer route
-      command: '{{ oc }} delete route customer'
-
-    - name: Create new ingress route for customer
-      shell: '{{ istioctl }} create -f istiofiles/gateway-customer.yml'
-      args:
-        chdir: '{{ tutorial_dir }}'
-      register: gateway_reg
-
-    - debug:
-        var: gateway_reg
-
-    - command: "{{ oc }} -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name==\"http2\")].nodePort}'"
-      register: nodePort_reg
-      
-
-    - set_fact:
-        node_port: '{{ nodePort_reg.stdout }}'
-
     - shell: ifconfig $(route |grep default|awk '{print $8}')|grep "inet "|awk '{print $2}'
       register: ip_reg
        
     - set_fact:
-        ip_address: '{{ ip_reg.stdout}}'
+        ip_address: '{{ ip_reg.stdout }}'
 
     - set_fact:
-        gateway_url: 'http://{{ ip_address }}:{{ node_port }}'
+        gateway_url: 'http://{{ ip_address }}'
 
     - debug:
         var: gateway_url

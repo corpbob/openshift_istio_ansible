@@ -13,11 +13,5 @@
     mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
     docker: "/bin/docker"
   tasks:
-    - name: Delete gateway
-      command: '{{ istioctl }} delete -f istiofiles/gateway-customer.yml'
-      args:
-        chdir: '{{ tutorial_dir }}'
-      register: gateway_reg
-      
-    - debug:
-        var: gateway_reg
+    - name: Restore route
+      command: oc expose service customer

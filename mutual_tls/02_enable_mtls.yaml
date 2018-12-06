@@ -19,3 +19,7 @@
         {{ istioctl }} create -f istiofiles/destination-rule-tls.yml
       args:
         chdir: '{{ tutorial_dir }}'
+      register: tls_reg
+
+    - debug:
+        var: tls_reg

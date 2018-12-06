@@ -68,6 +68,9 @@
       args:
         chdir: '{{ istio_dir }}'
 
+    - name: Create tutorial
+      command: '{{ oc }} new-project tutorial'
+
     - name: Create istio project
       command: '{{ oc }} apply -f install/kubernetes/istio-demo.yaml'
       args:
@@ -83,83 +86,3 @@
         - tracing
       ignore_errors: yes
 
-    - name: Create tutorial project
-      command: "{{ oc }} new-project tutorial"
-      ignore_errors: yes
-
-    - name: Add SCC
-      command: "{{ oc }} adm policy add-scc-to-user privileged -z default -n tutorial"
-
-    - name: Determine if directory is istio-tutorial exists
-      stat:
-        path: '{{ home }}/istio-tutorial'
-      register: directory_details
-
-    - name: Clone the tutorial
-      command: git clone https://github.com/redhat-developer-demos/istio-tutorial
-      args:
-        chdir: '{{ home }}'
-      when: not directory_details.stat.exists 
-    
-    - name: Compile customer service
-      command: "{{ mvn }} clean package"
-      args:
-        chdir: "{{ customer_dir }}"
-
-    - name: Build docker image
-      command: "{{ docker }} build -t example/customer ."
-      args:
-        chdir: "{{ customer_dir }}"
-
-    - name: Create the deployment
-      shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
-      args:
-        chdir: "{{ customer_dir }}"
-
-    - name: Create Service
-      command: "{{ oc }} create -f ../../kubernetes/Service.yml -n tutorial"
-      args:
-        chdir: "{{ customer_dir }}"
-
-    - name: Expose customer service
-      command: "{{ oc }} expose service customer"
-    
-    - name:  Build preference project
-      command: "{{ mvn }} clean package"
-      args:
-        chdir: "{{ preference_dir }}"
-
-    - name: Build preference docker image
-      command: "{{ docker }} build -t example/preference:v1 ."
-      args:
-        chdir: "{{ preference_dir }}"
-    
-    - name: Create the preference deployment
-      shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
-      args:
-        chdir: "{{ preference_dir }}" 
-
-    - name: Create preference Service
-      command: "{{ oc }} create -f ../../kubernetes/Service.yml -n tutorial"
-      args:
-        chdir: "{{ preference_dir }}"
- 
-    - name: Build Recommendation
-      command: "{{ mvn }} clean package"
-      args:
-        chdir: "{{ recommendation_dir }}"
-
-    - name: Build recommendation docker image
-      command: "{{ docker }} build -t example/recommendation:v1 ."
-      args:
-        chdir: "{{ recommendation_dir }}"
-    
-    - name: Create the recommendation deployment
-      shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
-      args:
-        chdir: "{{ recommendation_dir }}" 
-
-    - name: Create recommendation Service
-      command: "{{ oc }} create -f ../../kubernetes/Service.yml -n tutorial"
-      args:
-        chdir: "{{ recommendation_dir }}"
