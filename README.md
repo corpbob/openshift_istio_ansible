@@ -843,5 +843,13 @@ Compare the Elapsed time and Longest/Shortest transaction
 
 ![Istio Workload Dashboard](images/istio_workload_dashboard.png)
 
+### Demo Kiali
+
+1. Access the Kiali url and show the user how it looks like. The default credential is
+admin/admin
+
+2. Here's how kiali looks like:
+
+![Kiali Default View](images/istio_kiali_screenshot.png)
 
 # That's it!
