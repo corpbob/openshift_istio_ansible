@@ -867,4 +867,12 @@ admin/admin
 
 ![Kiali Default View](images/istio_kiali_screenshot.png)
 
+### Demo Jaeger
+
+1. Open the istio-tracing route.
+
+2. Here's how it looks like
+
+![Istio Tracing](images/istio_tracing.png)
+
 # That's it!
