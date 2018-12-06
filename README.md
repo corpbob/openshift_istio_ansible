@@ -116,10 +116,10 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 byt
 123456
 ```
 
-7. Access the url http://<your node ip address>:123456
+7. Access the url http://your.node.ip.address:123456
 
 ```
-$ curl http://<your node ip address>:123456
+$ curl http://your.node.ip.address:123456
 customer => preference => recommendation v2 from 768fb5c766-pnb9j: 3
 ```
 
@@ -150,7 +150,7 @@ x-envoy-decorator-operation: preference.tutorial.svc.cluster.local:8080/*
 10. Now do another  request
 
 ```
-$ curl http://<your node ip address>:123456
+$ curl http://your.node.ip.address:123456
 customer => preference => recommendation v2 from 768fb5c766-pnb9j: 4
 ```
 
