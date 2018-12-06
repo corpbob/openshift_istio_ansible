@@ -105,16 +105,15 @@
     - name: Add SCC
       command: "{{ oc }} adm policy add-scc-to-user privileged -z default -n tutorial"
 
-    - name: Determine if directory is istio-tutorial exists
-      stat:
+    - name: Delete if directory of istio-tutorial exists
+      file:
         path: '{{ home }}/istio-tutorial'
-      register: directory_details
+        state: absent
 
     - name: Clone the tutorial
       command: git clone https://github.com/redhat-developer-demos/istio-tutorial
       args:
         chdir: '{{ home }}'
-      when: not directory_details.stat.exists 
     
     - name: Compile customer service
       command: "{{ mvn }} clean package"
