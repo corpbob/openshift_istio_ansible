@@ -878,4 +878,11 @@ admin/admin
 
 ![Istio Tracing](images/istio_tracing.png)
 
+### Reference
+
+This demo is based on this excellent tutorial from Red Hat: 
+
+https://redhat-developer-demos.github.io/istio-tutorial/istio-tutorial/1.0.0/index.html
 # That's it!
+
+
