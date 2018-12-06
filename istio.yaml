@@ -41,7 +41,9 @@
       when: not maven_st.stat.exists
 
     - name: Unpack maven
-      command: 'tar xzf {{ home }}/apache-maven-3.5.4-bin.tar.gz'
+      command: 'tar xzf {{ home }}/apache-maven-3.5.4-bin.tar.gz -C {{ home }}'
+      args:
+        chdir: '{{ home }}'
       when: not maven_st.stat.exists
  
     - name: Check if istio needs to be downloaded
