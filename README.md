@@ -3,6 +3,18 @@
 ## Pre-requisites
 - An OKD 3.10 cluster
 - Create a user called istio that is able to sudo without a password.
+- ansible 2.4.3.0 or later 
+- siege load testing tool https://github.com/JoeDog/siege
+  which you can install in Mac using 
+
+```
+brew install siege
+```
+- create an alias for ansibile-playbook because it's so cumbersome to type. You can put the following in your $HOME/.bashrc
+
+```
+alias ap='ansible-playbook'
+```
 
 ## Set up
 1. Install apache-maven-3.5.4 and place it at /home/istio/apache-maven-3.5.4/
