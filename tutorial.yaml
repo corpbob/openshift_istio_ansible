@@ -1,0 +1,103 @@
+---
+- hosts: master
+  vars:
+    home: /root
+    istio_dir: "{{ home }}/istio-1.0.2"
+    istioctl: "{{ istio_dir }}/bin/istioctl"
+    tutorial_dir: "{{ home }}/istio-tutorial"
+    customer_dir: "{{ tutorial_dir }}/customer/java/springboot/"
+    recommendation_dir: "{{ tutorial_dir }}/recommendation/java/vertx"
+    preference_dir: "{{ tutorial_dir }}/preference/java/springboot"
+    oc: "/usr/bin/oc"
+    maven_dir: '{{ home }}/apache-maven-3.5.4'
+    mvn: "{{ maven_dir }}/bin/mvn"
+    maven_download_link: http://mirror.rise.ph/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz 
+    docker: "/bin/docker"
+  tasks:
+    - name: Create tutorial project
+      command: "{{ oc }} new-project tutorial"
+      ignore_errors: yes
+
+    - name: Add SCC
+      command: "{{ oc }} adm policy add-scc-to-user privileged -z default -n tutorial"
+
+    - name: Determine if directory is istio-tutorial exists
+      stat:
+        path: '{{ home }}/istio-tutorial'
+      register: directory_details
+
+    - name: Clone the tutorial
+      command: git clone https://github.com/redhat-developer-demos/istio-tutorial
+      args:
+        chdir: '{{ home }}'
+      when: not directory_details.stat.exists 
+    
+    - name: Compile customer service
+      command: "{{ mvn }} clean package"
+      args:
+        chdir: "{{ customer_dir }}"
+
+    - name: Build docker image
+      command: "{{ docker }} build -t example/customer ."
+      args:
+        chdir: "{{ customer_dir }}"
+
+    - name: Create the deployment
+      shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
+      args:
+        chdir: "{{ customer_dir }}"
+
+    - name: Create Service
+      command: "{{ oc }} create -f ../../kubernetes/Service.yml -n tutorial"
+      args:
+        chdir: "{{ customer_dir }}"
+
+    - name: Expose customer service
+      command: "{{ oc }} expose service customer"
+    
+    - name:  Build preference project
+      command: "{{ mvn }} clean package"
+      args:
+        chdir: "{{ preference_dir }}"
+
+    - name: Build preference docker image
+      command: "{{ docker }} build -t example/preference:v1 ."
+      args:
+        chdir: "{{ preference_dir }}"
+    
+    - name: Create the preference deployment
+      shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
+      args:
+        chdir: "{{ preference_dir }}" 
+
+    - name: Create preference Service
+      command: "{{ oc }} create -f ../../kubernetes/Service.yml -n tutorial"
+      args:
+        chdir: "{{ preference_dir }}"
+
+    - name: Create version 1
+      lineinfile:
+        path: '{{ recommendation_dir }}/src/main/java/com/redhat/developer/demos/recommendation/RecommendationVerticle.java'
+        regexp: '^(.*)recommendation v. from(.*)$'
+        line: '\1recommendation v1 from\2'
+        backrefs: yes
+ 
+    - name: Build Recommendation
+      command: "{{ mvn }} clean package"
+      args:
+        chdir: "{{ recommendation_dir }}"
+
+    - name: Build recommendation docker image
+      command: "{{ docker }} build -t example/recommendation:v1 ."
+      args:
+        chdir: "{{ recommendation_dir }}"
+    
+    - name: Create the recommendation deployment
+      shell: "{{ istioctl }} kube-inject -f ../../kubernetes/Deployment.yml| /bin/sed 's/- NET_ADMIN/- NET_ADMIN\\n          privileged: true\\n/g'| {{ oc }} apply -n tutorial -f -"
+      args:
+        chdir: "{{ recommendation_dir }}" 
+
+    - name: Create recommendation Service
+      command: "{{ oc }} create -f ../../kubernetes/Service.yml -n tutorial"
+      args:
+        chdir: "{{ recommendation_dir }}"
