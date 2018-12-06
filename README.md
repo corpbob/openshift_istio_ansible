@@ -827,4 +827,21 @@ Shortest transaction:	        0.01
 
 Compare the Elapsed time and Longest/Shortest transaction
 
+### Demo Grafana
+
+1. Before the demo, you can put load into your customer service so that you'll get a nice grafana graph
+
+```
+[root@18 simple_routing]# while true
+> do
+> curl http://customer-tutorial.18.214.127.95.nip.io/;sleep 0.5
+> done
+
+```
+
+2. Open the grafana url and show the audience the Istio Workload Dashboard:
+
+![Istio Workload Dashboard](images/istio_workload_dashboard.png)
+
+
 # That's it!
