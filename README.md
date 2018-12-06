@@ -17,12 +17,25 @@ alias ap='ansible-playbook'
 ```
 
 ## Set up
-1. Install apache-maven-3.5.4 and place it at /home/istio/apache-maven-3.5.4/
 1. Run the ansible script
 
 ```
 ansible-playbook -i hosts istio.yaml
 ```
+
+2. Install kiali
+
+```
+bash install_kiali.sh
+```
+
+You can ignore this error:
+
+```
+Error from server (AlreadyExists): error when creating "STDIN": clusterroles "kiali" already exists
+Error from server (AlreadyExists): error when creating "STDIN": clusterrolebindings "kiali" already exists
+```
+
 
 ## How to demo
 ### Demo mutual tls
@@ -826,6 +839,8 @@ Shortest transaction:	        0.01
 ```
 
 Compare the Elapsed time and Longest/Shortest transaction
+
+Now it's time to impress the audience with some graphics!
 
 ### Demo Grafana
 
