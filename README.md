@@ -1,4 +1,4 @@
-# How to setup Istio 1.0.2 on your OKD 3.10 cluster
+# How to setup and demo Istio 1.0.2 on your OKD 3.10 cluster
 
 ## Pre-requisites
 - An OKD 3.10 all-in-one-cluster. Have not tested with 3.11
