@@ -1,9 +1,12 @@
 # How to setup Istio 1.0.2 on your OKD 3.10 cluster
 
 ## Pre-requisites
-- An OKD 3.10 cluster
-- Create a user called istio that is able to sudo without a password.
+- An OKD 3.10 all-in-one-cluster. Have not tested with 3.11
 - ansible 2.4.3.0 or later 
+- ansible connection is local
+- ansible user is root
+- files will be downloaded in /root
+- docker binary is in /bin/docker
 - siege load testing tool https://github.com/JoeDog/siege
   which you can install in Mac using 
 
@@ -17,7 +20,7 @@ alias ap='ansible-playbook'
 ```
 
 ## Set up
-1. Run the ansible script
+1. Run the ansible script. It will download istio-1.0.2, apache-maven-3.5.4 and clone https://github.com/redhat-developer-demos/istio-tutorial.
 
 ```
 ansible-playbook -i hosts istio.yaml
