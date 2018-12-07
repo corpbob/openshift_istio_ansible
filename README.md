@@ -89,8 +89,15 @@ spec:
         exact: /
     route:
 ```
-3. Rsh to the customer pod
-First identify the pod
+3. Run these commands to execute tcpdump in the customer side-car container and skip to step 6 OR follow the steps below by identifying the pod manually.
+
+```
+MYIP=`oc rsh -c istio-proxy $(oc get po | grep customer.*2/2.*Running | awk '{print $1}') hostname -I`; echo $MYIP
+oc rsh -c istio-proxy $(oc get po | grep customer.*2/2.*Running | awk '{print $1}') sudo tcpdump -vvv -A -i eth0 "((dst port 8080) and (net $MYIP))"
+# If this fails, check the customer pod is up with 2/2 and try again.
+```
+
+First identify the pod.
 
 ```
 [root@18 mutual_tls]# oc get pods
@@ -99,6 +106,7 @@ customer-5f76f7f8ff-qkfvv            2/2       Running   0          15m
 preference-v1-8486bd5ff5-jszp9       2/2       Running   0          15m
 recommendation-v1-768fb5c766-pnb9j   2/2       Running   0          15m
 ```
+
 Next rsh to the pod.
 
 ```
@@ -136,6 +144,7 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 byt
 ```
 
 6. Open another terminal and cd to the  openshift_istio_ansible project.
+
 - Get your host IP address.
 - Get the nodeport of the service. Execute
 
@@ -144,10 +153,16 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 byt
 123456
 ```
 
-7. Access the url http://your.node.ip.address:123456
+7. Access the demo application
 
 ```
-$ curl http://your.node.ip.address:123456
+MYURL=http://`hostname -I | awk '{print $1}'`:`./show_node_port.sh`; echo $MYURL
+curl $MYURL
+```
+
+The output should look like this:
+
+```
 customer => preference => recommendation v2 from 768fb5c766-pnb9j: 3
 ```
 
