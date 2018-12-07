@@ -92,9 +92,8 @@ spec:
 3. Run these commands to execute tcpdump in the customer side-car container and skip to step 6 OR follow the steps below by identifying the pod manually.
 
 ```
-MYIP=`oc rsh -c istio-proxy $(oc get po | grep customer.*2/2.*Running | awk '{print $1}') hostname -I`; echo $MYIP
-oc rsh -c istio-proxy $(oc get po | grep customer.*2/2.*Running | awk '{print $1}') sudo tcpdump -vvv -A -i eth0 "((dst port 8080) and (net $MYIP))"
-# If this fails, check the customer pod is up with 2/2 and try again.
+bash ./run_tcpdump.sh
+# If this fails, check the customer pod is up (oc get pods) with 2/2 and try again.
 ```
 
 First identify the pod.
@@ -156,8 +155,7 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 byt
 7. Access the demo application
 
 ```
-MYURL=http://`hostname -I | awk '{print $1}'`:`./show_node_port.sh`; echo $MYURL
-curl $MYURL
+bash test_customer.sh
 ```
 
 The output should look like this:
