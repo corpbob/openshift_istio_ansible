@@ -13,6 +13,9 @@
     mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
     docker: "/bin/docker"
   tasks:
+    - name: Restore route
+      command: oc expose service customer
+
     - name: Delete customer route
       command: '{{ oc }} delete route customer'
 
