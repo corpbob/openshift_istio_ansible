@@ -13,10 +13,7 @@
     mvn: "{{ home }}/apache-maven-3.5.4/bin/mvn"
     docker: "/bin/docker"
   tasks:
-    - name: Restore route
-      command: oc expose service customer
-
-    - name: Delete customer route
+    - name: Delete customer route (on error, execute playbooks 04 and 05 and run 01 again) 
       command: '{{ oc }} delete route customer'
 
     - name: Create new ingress route for customer
