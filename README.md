@@ -923,4 +923,5 @@ This demo is based on this excellent tutorial from Red Hat:
 https://redhat-developer-demos.github.io/istio-tutorial/istio-tutorial/1.0.0/index.html
 # That's it!
 
+In case the source code needs to be shown in the demo, it's located at: $HOME/istio-tutorial/recommendation/java/vertx/ 
 
