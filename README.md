@@ -89,7 +89,7 @@ spec:
         exact: /
     route:
 ```
-3. Run these commands to execute tcpdump in the customer side-car container and skip to step 6 OR follow the steps below by identifying the pod manually.
+3. Run this script to execute tcpdump in the customer side-car container and skip to step 6 OR follow the steps below by identifying the pod manually.
 
 ```
 bash ./run_tcpdump.sh
@@ -144,7 +144,7 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 byt
 
 6. Open another terminal and cd to the  openshift_istio_ansible project.
 
-- Get your host IP address.
+- Get your host IP address OR go to 7 below to run a script to do it for you.
 - Get the nodeport of the service. Execute
 
 ```
@@ -153,6 +153,12 @@ tcpdump: listening on eth0, link-type EN10MB (Ethernet), capture size 262144 byt
 ```
 
 7. Access the demo application
+
+```
+curl http://your.node.ip.address:123456
+```
+
+or run this script:
 
 ```
 bash test_customer.sh
@@ -188,11 +194,17 @@ x-envoy-decorator-operation: preference.tutorial.svc.cluster.local:8080/*
 [root@18 mutual_tls]# ap 02_enable_mtls.yaml
 ```
 
-10. Now do another  request
+10. Now make another request
 
 ```
 $ curl http://your.node.ip.address:123456
 customer => preference => recommendation v2 from 768fb5c766-pnb9j: 4
+```
+
+or run this script:
+
+```
+bash test_customer.sh
 ```
 
 11. In your tcpdump window, show your audience the encrypted traffic:
@@ -228,6 +240,10 @@ No resources found.
 
 ### Demo Simple Routing
 1. cd to directory openshift_istio_ansible/simple_routing
+
+```
+cd ../simple_routing
+```
 
 2. Show the audience that you have pods running:
 
