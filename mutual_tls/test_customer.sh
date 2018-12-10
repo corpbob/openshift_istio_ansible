@@ -1,4 +1,5 @@
-MY_URL=http://`hostname -I | awk '{print $1}'`:`./show_node_port.sh`
+NODE_PORT=`oc -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}'`
+MY_URL=http://`hostname -I | awk '{print $1}'`:$NODE_PORT
 
 if [ "$1" = "-f" ]
 then

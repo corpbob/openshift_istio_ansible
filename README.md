@@ -769,6 +769,10 @@ Shortest transaction:	        0.01
 
 You can compare the Elapsed time and the Longest and Shortest transaction.
 
+As you can see, it took a lot longer to complete the load test since a delay has been introduced to one of the services. 
+Also, the longest transation has incresed due to the added delay.
+
+
 5. Now let's add a circuit breaker. Show the audience that this will open the circuit breaker when more than 1 request is being handled by one pod. You can show this via:
 
 ```
@@ -909,12 +913,21 @@ admin/admin
 
 ### Reset the demo
 
-The demo can be reset by deleteing both of the projects and starting from step 1 again.
+The demo can be reset by deleteing both of the projects and starting from step 1 again.  You can either start from the beginning:
 
 ```
 oc delete project tutorial istio-system
-ansible-playbook -i hosts istio.yaml  # Start from the beginning again
+(cd /root/openshift_istio_ansible && ansible-playbook -i hosts istio.yaml; bash install_kiali.sh)  # Start from the beginning again
 ```
+
+or just re-install the tutorial app
+
+```
+oc delete project tutorial 
+(cd /root/openshift_istio_ansible && ansible-playbook -i hosts istio.yaml) 
+```
+
+
 
 ### Reference
 
@@ -923,5 +936,16 @@ This demo is based on this excellent tutorial from Red Hat:
 https://redhat-developer-demos.github.io/istio-tutorial/istio-tutorial/1.0.0/index.html
 # That's it!
 
-In case the source code needs to be shown in the demo, it's located at: $HOME/istio-tutorial/recommendation/java/vertx/ 
+In case the source code needs to be shown in the demo, it's located at:
+
+- $HOME/istio-tutorial/customer/java/springboot ... CustomerController.java
+- $HOME/istio-tutorial/recommendation/java/vertx ... RecommendationController.java 
+- $HOME/istio-tutorial/preference/java/springboot ... PreferencesController.java
+
+You can find them all via:
+
+```
+find $HOME/istio-tutorial | grep Controller.java$ 
+```
+
 
