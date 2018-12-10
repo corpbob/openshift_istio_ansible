@@ -907,6 +907,15 @@ admin/admin
 
 ![Istio Tracing](images/istio_tracing.png)
 
+### Reset the demo
+
+The demo can be reset by deleteing both of the projects and starting from step 1 again.
+
+```
+oc delete project tutorial istio-system
+ansible-playbook -i hosts istio.yaml  # Start from the beginning again
+```
+
 ### Reference
 
 This demo is based on this excellent tutorial from Red Hat: 
